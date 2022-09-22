@@ -18,6 +18,10 @@ const switchPlayer = function (currentScore) {
   player2.classList.toggle("player--active");
 };
 
+const checkActive = function (player) {
+  return player.classList.contains("player--active");
+};
+
 const restart = function () {
   points = 0;
   currentScore1.textContent = points;
@@ -29,19 +33,29 @@ const restart = function () {
   player2.classList.remove("player--active");
   player1.classList.remove("player--winner");
   player2.classList.remove("player--winner");
+  dicePic.classList.toggle("hidden");
+};
+
+const winner = function (player, score) {
+  player.classList.toggle("player--winner");
+  score.textContent = 100;
+  dicePic.classList.toggle("hidden");
+};
+
+const scoreAdd = function (score, currentScore) {
+  return Number(score.textContent) + Number(currentScore.textContent);
 };
 
 rollDice.addEventListener("click", () => {
   const randomDice = Math.trunc(Math.random() * 6 + 1);
   points += randomDice;
-  console.log(randomDice + "---thedice");
-  console.log(points);
+
   dicePic.setAttribute("src", `./dice-${randomDice}.png`);
-  if (randomDice === 1 && player1.classList.contains("player--active")) {
+  if (randomDice === 1 && checkActive(player1)) {
     switchPlayer(currentScore1);
-  } else if (randomDice === 1 && player2.classList.contains("player--active")) {
+  } else if (randomDice === 1 && checkActive(player2)) {
     switchPlayer(currentScore2);
-  } else if (player1.classList.contains("player--active")) {
+  } else if (checkActive(player1)) {
     currentScore1.textContent = points;
   } else {
     currentScore2.textContent = points;
@@ -49,25 +63,15 @@ rollDice.addEventListener("click", () => {
 });
 
 holdDice.addEventListener("click", () => {
-  if (
-    player1.classList.contains("player--active") &&
-    Number(score1.textContent) + Number(currentScore1.textContent) >= 100
-  ) {
-    player1.classList.toggle("player--winner");
-    score1.textContent = 100;
-  } else if (
-    player2.classList.contains("player--active") &&
-    Number(score2.textContent) + Number(currentScore2.textContent) >= 100
-  ) {
-    player2.classList.toggle("player--winner");
-    score2.textContent = 100;
-  } else if (player1.classList.contains("player--active")) {
-    score1.textContent =
-      Number(score1.textContent) + Number(currentScore1.textContent);
+  if (checkActive(player1) && scoreAdd(score1, currentScore1) >= 100) {
+    winner(player1, score1);
+  } else if (checkActive(player2) && scoreAdd(score2, currentScore2) >= 100) {
+    winner(player2, score2);
+  } else if (checkActive(player1)) {
+    score1.textContent = scoreAdd(score1, currentScore1);
     switchPlayer(currentScore1);
   } else {
-    score2.textContent =
-      Number(score2.textContent) + Number(currentScore2.textContent);
+    score2.textContent = scoreAdd(score2, currentScore2);
     switchPlayer(currentScore2);
   }
 });
