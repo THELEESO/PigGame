@@ -10,6 +10,8 @@ const score2 = document.querySelector("#score--1");
 const currentScore1 = document.querySelector("#current--0");
 const currentScore2 = document.querySelector("#current--1");
 let points = 0;
+let playStatus = true;
+dicePic.classList.add("hidden");
 
 const switchPlayer = function (currentScore) {
   points = 0;
@@ -23,6 +25,7 @@ const checkActive = function (player) {
 };
 
 const restart = function () {
+  playStatus = true;
   points = 0;
   currentScore1.textContent = points;
   currentScore2.textContent = points;
@@ -33,34 +36,41 @@ const restart = function () {
   player2.classList.remove("player--active");
   player1.classList.remove("player--winner");
   player2.classList.remove("player--winner");
-  dicePic.classList.toggle("hidden");
+  dicePic.classList.add("hidden");
 };
 
 const winner = function (player, score) {
   player.classList.toggle("player--winner");
   score.textContent = 100;
   dicePic.classList.toggle("hidden");
+  playStatus = false;
 };
 
 const scoreAdd = function (score, currentScore) {
   return Number(score.textContent) + Number(currentScore.textContent);
 };
 
-rollDice.addEventListener("click", () => {
-  const randomDice = Math.trunc(Math.random() * 6 + 1);
-  points += randomDice;
+const diceEvnet = function () {
+  if (playStatus) {
+    const randomDice = Math.trunc(Math.random() * 6 + 1);
+    points += randomDice;
 
-  dicePic.setAttribute("src", `./dice-${randomDice}.png`);
-  if (randomDice === 1 && checkActive(player1)) {
-    switchPlayer(currentScore1);
-  } else if (randomDice === 1 && checkActive(player2)) {
-    switchPlayer(currentScore2);
-  } else if (checkActive(player1)) {
-    currentScore1.textContent = points;
-  } else {
-    currentScore2.textContent = points;
+    dicePic.setAttribute("src", `./dice-${randomDice}.png`);
+    dicePic.classList.remove("hidden");
+
+    if (randomDice === 1 && checkActive(player1)) {
+      switchPlayer(currentScore1);
+    } else if (randomDice === 1 && checkActive(player2)) {
+      switchPlayer(currentScore2);
+    } else if (checkActive(player1)) {
+      currentScore1.textContent = points;
+    } else {
+      currentScore2.textContent = points;
+    }
   }
-});
+};
+
+rollDice.addEventListener("click", diceEvnet);
 
 holdDice.addEventListener("click", () => {
   if (checkActive(player1) && scoreAdd(score1, currentScore1) >= 100) {
